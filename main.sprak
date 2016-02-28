@@ -1,0 +1,193 @@
+string diskContents = LoadData()
+
+main()
+
+
+
+void main()
+    initialize()
+end
+
+void initialize()
+    ClearText()
+    showLogo()
+    getFloppy()
+end
+
+
+void getFloppy()
+    if HasFloppy() != true
+        Print("Error: No Floppy Detected!")
+        Print("Please Insert Disk to Start!")
+    end
+    
+    if HasFloppy() == true
+        Sleep(1)
+        Print("Floppy disk detected...")
+        Sleep(1)
+        Print("Reading...")
+        Sleep(1)
+        readDisk()
+        end    
+end
+
+
+void readDisk()
+  
+  string format = "SPRAKFD"    
+
+  loop i from 0 to 6
+      if diskContents[i+1] == format[i]
+          Print(" ")
+          
+      else
+          Print("Disk Not Formatted!")
+          formatDisk()    
+   end  
+ end
+ Print("SPRAK OS Disk Detected...")
+ getDiskContent()
+end
+
+
+void formatDisk()
+    Print("Would you like to format the disk?")
+    
+end
+
+void getDiskContent()
+ ClearMemories()
+    array userName
+    string diskContents = LoadData()    
+    number length = Int(Count(diskContents)) - 2
+          
+   Print(Count(diskContents))        
+      
+      
+   loop x from 1 to length
+          
+       Print(diskContents[x])
+   end
+   end  
+  
+  
+    
+ #   loop i from 0 to Count(diskContents)
+ #       if diskContents[i] == ";"   
+ #          Print(" ")
+ #          userName[i] = diskContents[i]     
+                
+ #   else
+ #          ClearText()
+ #          Print("Hello!")
+ #          Print(userName)
+           
+
+void newUserSetup()
+   ClearText()
+   Print("Welcome to SparkOS, new user!")
+   Print("Please enter your preferred user name:")
+   string newUser = Input("User Name >")
+   string newPassword = Input("Password >")
+   string checkPassword = Input("Please Re-enter Password>")
+   
+   if newPassword == checkPassword
+       Print("Passwords Match!")
+       Sleep(1.0)
+       ClearText()
+       Print("Creating New User Environment...")
+       Print("*")
+       Sleep(1.0)
+       ClearText()
+       Print("Creating New User Environment...")
+       Print("* *")
+       Sleep(1.0)
+       ClearText()
+       Print("Creating New User Environment...")
+       Print("* * *")
+       Sleep(1.0)
+       ClearText()
+       Print("Creating New User Environment...")
+       Print("* * * *")
+       Sleep(1.0)
+       ClearText()
+       Print("Creating New User Environment...")
+       Print("* * * * *")
+       Sleep(1.0)
+       ClearText()
+       Print("Creating New User Environment...")
+       Print("* * * * * *")
+       Sleep(1.0)
+       ClearText()
+       Print("Creating New User Environment...")
+       Print("* * * * * * *")
+       Sleep(1.0)
+       ClearText()
+       Print("Creating New User Environment...")
+       Print("* * * * * * * *")
+       Sleep(1.0)
+       ClearText()
+       Print("Creating New User Environment...")
+       Print("* * * * * * * * *")
+       Sleep(1.0)
+       ClearText()
+       Print("Creating New User Environment...")
+       Print("* * * * * * * * * *")
+       
+       
+       
+       
+       
+       
+       
+       
+   else    
+      Print("Password Mismatch! Please try again!")
+      Sleep(3.0)
+      newUserSetup()
+      end  
+    
+end
+
+
+
+
+void showLogo()
+    
+Print("  **** *****   *******    ****   ***   ***    ***")     
+Print("*****  ******  ********  ******  ***  ***    *****")  
+Print("***    **  **  ***  ***  **  **  *** ***    **   **") 
+Print(" ***   **  **  ***  **   **  **  ******     **   **")  
+Print("  ***  *****   ******    ******  *****       *****")
+Print("   *** ****    *****     ******  *****        ***  ")
+Print("   *** **      **  **    **  **  ** ***          ")
+Print(" ***   **      **  ***   **  **  **  ***       ****")
+Print("**     **      **   **   **  **  **  ****     ***   ")      
+Print("                                              *****")      
+Print("Version 1.0                                     ***")
+Print("                                              ****  ")   
+Print(" ")
+Print(" ")
+Print(" ")  
+end
+
+void unixCommand(string command)
+    if command == "ls"
+        ls()
+    end
+    
+     
+end
+
+void ls()
+    
+end
+
+void rm(string myFile)
+    end
+    
+void cp(string oldFile, string newFile)
+    end
+    
+void cd(string myPath)
+    end
