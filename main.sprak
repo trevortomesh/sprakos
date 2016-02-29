@@ -1,4 +1,5 @@
 string diskContents = LoadData()
+array cmdList = ["help", "quit", "info"]
 
 main()
 
@@ -11,14 +12,10 @@ end
 void initialize()
     ClearText()
     showLogo()
-    getFloppy()
-end
-
-
-void getFloppy()
     if HasFloppy() != true
         Print("Error: No Floppy Detected!")
         Print("Please Insert Disk to Start!")
+	Quit()
     end
     
     if HasFloppy() == true
@@ -28,71 +25,84 @@ void getFloppy()
         Print("Reading...")
         Sleep(1)
         readDisk()
-        end    
+    end    
 end
 
 
 void readDisk()
-  
-  string format = "SPRAKFD"    
+  bool formatted
+  string format = ", SPRAKFD"    
 
+  if HasIndex(diskContents,6)
   loop i from 0 to 6
       if diskContents[i+1] == format[i]
-          Print(" ")
+          
+          formatted = True
           
       else
-          Print("Disk Not Formatted!")
-          formatDisk()    
+          formatted = False
    end  
  end
- Print("SPRAK OS Disk Detected...")
- getDiskContent()
+ else
+     formatted = False
+end
+ 
+ if formatted == True
+     Print("SPRAK OS Disk Detected...")
+     #Print(LoadData())
+     array diskLines
+     string thisLine = ""
+     
+     
+     loop i from 3 to (Count(diskContents) - 2)
+        if diskContents[i] != ","
+             thisLine = thisLine + diskContents[i]
+         end
+         if diskContents[i] == ","    
+             Append(diskLines,thisLine)
+             thisLine = ""
+         end
+        if diskContents[i] == " "
+            thisLine = ""
+    end
+        end     
+     Print(diskLines)
+ 
+ 
+else
+    Print("Disk not properly formatted!")
+    string choice = Input("Format Disk? (y/n)")
+    if choice == "y"
+        formatDisk()
+
+    else 
+      Print("Shutting Down...")
+      Sleep(3)  
+      ClearText()  
+      Quit()
+end
+end
+     
 end
 
 
 void formatDisk()
-    Print("Would you like to format the disk?")
-    
-end
+    Print("Formatting...")
+    ClearData()
+    SaveData("SPRAKFD")
 
-void getDiskContent()
- ClearMemories()
+# ClearMemories()
     array userName
     string diskContents = LoadData()    
     number length = Int(Count(diskContents)) - 2
-          
-   Print(Count(diskContents))        
-      
-      
-   loop x from 1 to length
-          
-       Print(diskContents[x])
-   end
-   end  
-  
-  
-    
- #   loop i from 0 to Count(diskContents)
- #       if diskContents[i] == ";"   
- #          Print(" ")
- #          userName[i] = diskContents[i]     
-                
- #   else
- #          ClearText()
- #          Print("Hello!")
- #          Print(userName)
-           
-
-void newUserSetup()
    ClearText()
-   Print("Welcome to SparkOS, new user!")
+   Print("Welcome to SprakOS, new user!")
    Print("Please enter your preferred user name:")
    string newUser = Input("User Name >")
-   string newPassword = Input("Password >")
-   string checkPassword = Input("Please Re-enter Password>")
-   
-   if newPassword == checkPassword
-       Print("Passwords Match!")
+   string checkUser = Input("Confirm User Name >")
+  
+   if newUser == checkUser
+       Print("User-names Match!")
        Sleep(1.0)
        ClearText()
        Print("Creating New User Environment...")
@@ -132,22 +142,50 @@ void newUserSetup()
        Sleep(1.0)
        ClearText()
        Print("Creating New User Environment...")
-       Print("* * * * * * * * * *")
-       
-       
-       
-       
-       
-       
-       
-       
+       Print("* * * * * * * * * *")    
+       ClearText()
+
+       SaveData(newUser)
+       commandPrompt(newUser)
    else    
-      Print("Password Mismatch! Please try again!")
+      Print("Username Mismatch! Please try again!")
       Sleep(3.0)
-      newUserSetup()
+      formatDisk()
       end  
     
 end
+
+
+
+
+void commandPrompt(string user)
+
+loop
+	string cmd = Input(user+":$ ")
+	
+
+		if cmd == "info"
+			Print(Info())			
+		end
+
+		if cmd == "help"
+			Print(cmdList)
+		end
+
+ 		 if cmd == "quit"
+     			Print("Goodbye," + user)
+  		end
+
+		
+		if cmd == "save"
+			Print("user data for"+ user + "saved to disk.")
+			ClearData()
+			SaveData("SPRAKFD")
+   SaveData(user)  
+end
+end
+end
+			
 
 
 
@@ -174,9 +212,7 @@ end
 void unixCommand(string command)
     if command == "ls"
         ls()
-    end
-    
-     
+    end     
 end
 
 void ls()
@@ -189,5 +225,4 @@ void rm(string myFile)
 void cp(string oldFile, string newFile)
     end
     
-void cd(string myPath)
-    end
+
