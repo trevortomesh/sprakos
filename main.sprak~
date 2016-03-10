@@ -2,6 +2,7 @@ string diskContents
 array cmdList = ["help", "quit", "info", "rm", "cp", "mv", "cd", "mkdir"]
 Array dirStr = []
 Array usrDir = []
+Array lineMrk = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 main()
 
 ##############################################
@@ -71,22 +72,25 @@ end
 
 void initialize()
     ClearText()
-    showLogo()
+    showLogo() 
     if HasFloppy() != true
         Print("No Floppy Detected!")
         Print("You will not be able to save.")
         Print("Start without disk? (y/n)")
         string choice = Input(">")
         if choice == "y"
-        commandPrompt("guest")    
-	end
-
-	else	
-	Quit()
-	end
-    end
+         commandPrompt("guest")    
+        end 
+         
+        if choice == "n"
+	
+          Print("Quitting...")
+         	Quit()
+       end  
+   end
     
     if HasFloppy() == true
+   #     Print("Check2")
         Sleep(1)
         Print("Floppy disk detected...")
         Sleep(1)
@@ -94,8 +98,8 @@ void initialize()
         Sleep(1)
         diskContents = LoadData()
         readDisk()
-    end    
-
+    end
+ end    
 
 ##########################################
 void readDisk()
@@ -127,13 +131,22 @@ end
         if diskContents[i] != ","
             if diskContents[i] != " "
              thisLine = thisLine + diskContents[i]
-           # Print(thisLine)
+          # Print(thisLine);
+                   
          end
-     else
-         Append(diskLines,thisLine)
      end
+        if diskContents[i] == ","
+            lineMrk[0]=i;
+           # Print(lineMrk[0])
+            Append(diskLines, thisLine)
+            thisLine = ""
+        end
+        
  end
- Print(diskLines)
+    
+ commandPrompt(diskLines[1])    
+ 
+ 
 else
     Print("Disk not properly formatted!")
     string choice = Input("Format Disk? (y/n)")
@@ -211,6 +224,7 @@ void formatDisk()
        ClearText()
 
        SaveData(newUser)
+       SaveData("buffLine1")
        commandPrompt(newUser)
    else    
       Print("Username Mismatch! Please try again!")

@@ -1,13 +1,30 @@
 string diskContents
 array cmdList = ["help", "quit", "info", "rm", "cp", "mv", "cd", "mkdir"]
 Array dirStr = []
-Array usrDir = []
-Array lineMrk = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+Array lineMrk = []
+Array diskLines = []
+
 main()
 
 ##############################################
 void commandPrompt(string user)
 dirStr = ["Documents","Music","Pictures","Programs"]
+Array usrDir = []
+Number udLen
+Number udStart
+loop i from 0 to Count(diskLines)
+    if diskLines[i] == "udir"
+        udStart = i + 2
+        udLen = diskLines[i + 1]
+        break()
+        
+end
+end
+
+loop i from udStart to (udStart + udLen - 1)
+    Append(usrDir,diskLines[i])
+end
+
 
 loop
 	string cmd = Input(user+":$ ")
@@ -21,9 +38,13 @@ loop
 			Print(cmdList)
 		end
 
- 		 if cmd == "quit"
-     			Print("Goodbye," + user)
-       			Quit()
+ 		 if cmd == "quit" || cmd == "exit"
+     			Print("Goodbye, " + user)
+         Sleep(3)
+         ClearText()
+         Print("Shutting down...")
+         Sleep(3)
+       	    Quit()      
   		end
 
 		if cmd == "ls"
@@ -39,7 +60,14 @@ loop
 			Print("user data for"+ user + "saved to disk.")
 			ClearData()
 			SaveData("SPRAKFD")
-   SaveData(user)  
+   SaveData(user)
+   SaveData("udir")
+   SaveData(Count(usrDir)) 
+   loop i from 0 to Count(usrDir) - 1
+   SaveData(usrDir[i])
+   end
+   SaveData("eudir")
+   SaveData("EOF") 
 end
 end
 end
@@ -123,27 +151,29 @@ end
  if formatted == True
      Print("SPRAK OS Disk Detected...")
      
-     array diskLines
+    # array diskLines
      string thisLine = ""
      
      
      loop i from 3 to (Count(diskContents) - 2)
         if diskContents[i] != ","
-            if diskContents[i] != " "
+            if diskContents[i] != " " 
+            
              thisLine = thisLine + diskContents[i]
-          # Print(thisLine);
-                   
+             
          end
      end
         if diskContents[i] == ","
-            lineMrk[0]=i;
-           # Print(lineMrk[0])
+            Append(lineMrk, i)
+       
             Append(diskLines, thisLine)
             thisLine = ""
         end
         
  end
-    
+ Print("Welcome, " + diskLines[1])
+ Sleep(3)
+ ClearText()    
  commandPrompt(diskLines[1])    
  
  
@@ -169,7 +199,6 @@ void formatDisk()
     ClearData()
     SaveData("SPRAKFD")
 
-# ClearMemories()
     array userName
     string diskContents = LoadData()    
     number length = Int(Count(diskContents)) - 2
