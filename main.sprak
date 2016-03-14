@@ -1,290 +1,335 @@
+# Sprak OS version 1.0 
+# (2016) Trevor M. Tomesh
+# github.com/trevortomesh/sprakos
+# This code is free -- do whatever you want with it.
+
+# Global variables -- naughty. 
 string diskContents
+string diskWriteNeeded = "false" 
 array cmdList = ["help", "quit", "info", "rm", "cp", "mv", "cd", "mkdir"]
 Array dirStr = []
 Array lineMrk = []
 Array diskLines = []
 
-main()
+initialize() #initialize the system by doing disk checks, etc.
 
-##############################################
+##############################################################
+###########COMMAND PROMPT FUNCTION############################
+#This is basically our "main" function, 
+#We will always return to this...
 void commandPrompt(string user)
-dirStr = ["Documents","Music","Pictures","Programs"]
-Array usrDir = []
-Number udLen
-Number udStart
-loop i from 0 to Count(diskLines)
-    if diskLines[i] == "udir"
+  dirStr = ["Documents","Music","Pictures","Programs"]
+  Array usrDir = []
+  Number udLen
+  Number udStart
+
+  if HasIndex(diskLines,0)   
+    loop i from 0 to Count(diskLines)
+      if diskLines[i] == "udir"
         udStart = i + 2
         udLen = diskLines[i + 1]
-        break()
-        
-end
-end
-
-loop i from udStart to (udStart + udLen - 1)
-    Append(usrDir,diskLines[i])
-end
+        break()       
+      end
+    end
 
 
-loop
-	string cmd = Input(user+":$ ")
-	
+    loop i from udStart to (udStart + udLen - 1)
+      Append(usrDir,diskLines[i])
+    end
+  end
 
-		if cmd == "info"
-			Print(Info())			
-		end
+  loop
+     string cmd = Input(user+":$ ")
+     #parse(cmd)
 
-		if cmd == "help"
-			Print(cmdList)
-		end
+    if cmd == "info"
+        Print(Info())     
+    end
 
- 		 if cmd == "quit" || cmd == "exit"
-     			Print("Goodbye, " + user)
-         Sleep(3)
-         ClearText()
-         Print("Shutting down...")
-         Sleep(3)
-       	    Quit()      
-  		end
+    if cmd == "help"
+      Print(cmdList)
+    end
 
-		if cmd == "ls"
-			Print(dirStr + usrDir)
-		end
-		
-		if cmd == "mkdir"
-    Append(usrDir,Input("Dir Name? "))
-    Print(dirStr + usrDir)
-			end
+    if cmd == "quit" || cmd == "exit"
+      Print("Goodbye, " + user)
+      shutDown()
+    end
 
-		if cmd == "save"
-			Print("user data for"+ user + "saved to disk.")
-			ClearData()
-			SaveData("SPRAKFD")
-   SaveData(user)
-   SaveData("udir")
-   SaveData(Count(usrDir)) 
-   loop i from 0 to Count(usrDir) - 1
-   SaveData(usrDir[i])
-   end
-   SaveData("eudir")
-   SaveData("EOF") 
-end
-end
+    if cmd == "ls"
+      Print(dirStr + usrDir)
+    end
+    
+    if cmd == "mkdir"
+      Append(usrDir,Input("Dir Name? "))
+      Print(dirStr + usrDir)
+      diskWriteNeeded = "True"
+    end
+
+
+    ### This is very broken! -- Fix this later!
+    #if cmd == "rm"   
+    #  Print("Remove Which?:")
+    #  loop i from 0 to (Count(usrDir) - 1)
+    #    Print(i + ") " + usrDir[i])
+    #  end
+    #  Remove(usrDir,Input("> ")) 
+    #  save(usrDir, user)
+    #  Print(dirStr + usrDir)
+
+    #end
+
+
+
+    if cmd == "save"
+      if diskWriteNeeded == "false"
+        Print("No changes to write to disk!")
+        Sleep(3)
+      end
+
+      if diskWriteNeeded == "true"  
+        Print("user data for"+ user + "saved to disk.")
+        save(usrDir, user)  
+      end
+    end
+  end 
 end
 #################################################
+#################################################
 
-void unixCommand(string command)
-    if command == "ls"
-        ls()
-    end     
+void parse(string rawString)
+  Print(rawString)
+  end
+
+
+
+void save(Array usrDir, string user)
+  ClearData()
+  SaveData("SPRAKFD")
+  SaveData(user)
+  SaveData("udir")
+  SaveData(Count(usrDir)) 
+  loop i from 0 to Count(usrDir) - 1
+    SaveData(usrDir[i])
+  end
+   
+  SaveData("eudir")
+  SaveData("EOF") 
 end
 
-void ls()
-    
-end
+void shutDown()
+  Sleep(3)
+  ClearText()
+  Print("Shutting down...")
+  Sleep(3)
+  ClearText()
+  break()
+  Quit()  
+end    
 
-void rm(string myFile)
-    end
-    
-void cp(string oldFile, string newFile)
-    end
-    
-################################################
-
-
-
-
-void main()
-    initialize()
-end
-
+################INITIALIZATION FUNCTION #############
 void initialize()
-    ClearText()
-    showLogo() 
-    if HasFloppy() != true
-        Print("No Floppy Detected!")
-        Print("You will not be able to save.")
-        Print("Start without disk? (y/n)")
-        string choice = Input(">")
-        if choice == "y"
-         commandPrompt("guest")    
-        end 
+  ClearText()
+  showLogo() 
+  if HasFloppy() != true
+    Print("No Floppy Detected!")
+    Print("You will not be able to save.")
+    Print("Start without disk? (y/n)")
+    string choice = Input(">")
+    if choice == "y"
+      commandPrompt("guest")    
+    end 
          
-        if choice == "n"
-	
-          Print("Quitting...")
-         	Quit()
-       end  
-   end
+    if choice == "n"
+  
+      Print("Quitting...")
+      Quit()
+    end  
+  end
     
-    if HasFloppy() == true
+  if HasFloppy() == true
    #     Print("Check2")
-        Sleep(1)
-        Print("Floppy disk detected...")
-        Sleep(1)
-        Print("Reading...")
-        Sleep(1)
-        diskContents = LoadData()
-        readDisk()
-    end
- end    
+    Sleep(1)
+    Print("Floppy disk detected...")
+    Sleep(1)
+    Print("Reading...")
+    Sleep(1)
+    diskContents = LoadData()
+    readDisk()
+  end
+end    
 
-##########################################
+##########READ DISK#################
+#This is an ugly little routine to read
+#the data off of a disk. It's a mess, 
+#but it works.
+#Don't mess with it -- yet.
+
 void readDisk()
   bool formatted
   string format = ", SPRAKFD"    
 
   if HasIndex(diskContents,6)
-  loop i from 0 to 6
+    loop i from 0 to 6
       if diskContents[i+1] == format[i]
           
-          formatted = True
+        formatted = True
           
       else
-          formatted = False
-   end  
- end
- else
-     formatted = False
-end
+        formatted = False
+      end  
+    end
  
- if formatted == True
-     Print("SPRAK OS Disk Detected...")
+  else
+    formatted = False
+  end
+ 
+  if formatted == True
+    Print("SPRAK OS Disk Detected...")
      
-    # array diskLines
-     string thisLine = ""
+    string thisLine = ""
      
      
-     loop i from 3 to (Count(diskContents) - 2)
-        if diskContents[i] != ","
-            if diskContents[i] != " " 
-            
-             thisLine = thisLine + diskContents[i]
-             
-         end
-     end
-        if diskContents[i] == ","
-            Append(lineMrk, i)
-       
-            Append(diskLines, thisLine)
-            thisLine = ""
+    loop i from 3 to (Count(diskContents) - 2)
+      if diskContents[i] != ","
+        if diskContents[i] != " " 
+          thisLine = thisLine + diskContents[i]   
         end
+      end
+      
+      if diskContents[i] == ","
+        Append(lineMrk, i)
+       
+        Append(diskLines, thisLine)
+        thisLine = ""
+      end
         
- end
- Print("Welcome, " + diskLines[1])
- Sleep(3)
- ClearText()    
- commandPrompt(diskLines[1])    
+    end
+  
+  Print("Welcome, " + diskLines[1])
+  Sleep(3)
+  ClearText()    
+  commandPrompt(diskLines[1])    
  
  
-else
+  else
     Print("Disk not properly formatted!")
     string choice = Input("Format Disk? (y/n)")
     if choice == "y"
-        formatDisk()
+      formatDisk()
 
     else 
       Print("Shutting Down...")
       Sleep(3)  
       ClearText()  
       Quit()
-end
-end
-     
+    end
+  end
+
 end
 
 
+###############FORMAT DISK####################
 void formatDisk()
-    Print("Formatting...")
-    ClearData()
-    SaveData("SPRAKFD")
+  Print("Formatting...")
+  ClearData()
+  SaveData("SPRAKFD")
 
-    array userName
-    string diskContents = LoadData()    
-    number length = Int(Count(diskContents)) - 2
-   ClearText()
-   Print("Welcome to SprakOS, new user!")
-   Print("Please enter your preferred user name:")
-   string newUser = Input("User Name >")
-   string checkUser = Input("Confirm User Name >")
+  ClearText()
+  Print("Welcome to SprakOS, new user!")
+  Print("Please enter your preferred user name:")
+  string newUser = Input("User Name >")
+  string checkUser = Input("Confirm User Name >")
   
-   if newUser == checkUser
-       Print("User-names Match!")
-       Sleep(1.0)
-       ClearText()
-       Print("Creating New User Environment...")
-       Print("*")
-       Sleep(1.0)
-       ClearText()
-       Print("Creating New User Environment...")
-       Print("* *")
-       Sleep(1.0)
-       ClearText()
-       Print("Creating New User Environment...")
-       Print("* * *")
-       Sleep(1.0)
-       ClearText()
-       Print("Creating New User Environment...")
-       Print("* * * *")
-       Sleep(1.0)
-       ClearText()
-       Print("Creating New User Environment...")
-       Print("* * * * *")
-       Sleep(1.0)
-       ClearText()
-       Print("Creating New User Environment...")
-       Print("* * * * * *")
-       Sleep(1.0)
-       ClearText()
-       Print("Creating New User Environment...")
-       Print("* * * * * * *")
-       Sleep(1.0)
-       ClearText()
-       Print("Creating New User Environment...")
-       Print("* * * * * * * *")
-       Sleep(1.0)
-       ClearText()
-       Print("Creating New User Environment...")
-       Print("* * * * * * * * *")
-       Sleep(1.0)
-       ClearText()
-       Print("Creating New User Environment...")
-       Print("* * * * * * * * * *")    
-       ClearText()
+  if newUser == checkUser #make sure we have the user name right...
 
-       SaveData(newUser)
-       SaveData("buffLine1")
-       commandPrompt(newUser)
-   else    
-      Print("Username Mismatch! Please try again!")
-      Sleep(3.0)
-      formatDisk()
-      end  
+    #showCreating() # Uncheck this to show "creating" screen -- disabled because it takes too long!
     
+    #This writes default "formatting" data to floppy. 
+    ClearText() #clear the screen text
+    SaveData(newUser) # write the provided user name to the floppy
+    SaveData("udir")  # prep comp. to deal with user directories
+    SaveData("0")     # how many user directories do we have?
+    SaveData("eudir") # tell comp. we're done with user dirs
+    SaveData("EOF")   # tell comp. we're at the end of floppy. 
+    
+    commandPrompt(newUser) #send our new user to the command prompt. 
+  
+  else    
+    Print("Username Mismatch! Please try again!")
+    Sleep(3.0)
+    formatDisk()
+  end  
+
 end
 ######################################################
+######################################################
+######################################################
+      
 
-			
-
-
+####################### GRAPHICS ROUTINES ############################
+######################################################################
+void showCreating()
+  Print("User-names Match!")
+  Sleep(1.0)
+  ClearText()
+  Print("Creating New User Environment...")
+  Print("*")
+  Sleep(1.0)
+  ClearText()
+  Print("Creating New User Environment...")
+  Print("* *")
+  Sleep(1.0)
+  ClearText()
+  Print("Creating New User Environment...")
+  Print("* * *")
+  Sleep(1.0)
+  ClearText()
+  Print("Creating New User Environment...")
+  Print("* * * *")
+  Sleep(1.0)
+  ClearText()
+  Print("Creating New User Environment...")
+  Print("* * * * *")
+  Sleep(1.0)
+  ClearText()
+  Print("Creating New User Environment...")
+  Print("* * * * * *")
+  Sleep(1.0)
+  ClearText()
+  Print("Creating New User Environment...")
+  Print("* * * * * * *")
+  Sleep(1.0)
+  ClearText()
+  Print("Creating New User Environment...")
+  Print("* * * * * * * *")
+  Sleep(1.0)
+  ClearText()
+  Print("Creating New User Environment...")
+  Print("* * * * * * * * *")
+  Sleep(1.0)
+  ClearText()
+  Print("Creating New User Environment...")
+  Print("* * * * * * * * * *")    
+  ClearText()
+end
+###################################################
 
 
 void showLogo()
-    
-Print("  **** *****   *******    ****   ***   ***    ***")     
-Print("*****  ******  ********  ******  ***  ***    *****")  
-Print("***    **  **  ***  ***  **  **  *** ***    **   **") 
-Print(" ***   **  **  ***  **   **  **  ******     **   **")  
-Print("  ***  *****   ******    ******  *****       *****")
-Print("   *** ****    *****     ******  *****        ***  ")
-Print("   *** **      **  **    **  **  ** ***          ")
-Print(" ***   **      **  ***   **  **  **  ***       ****")
-Print("**     **      **   **   **  **  **  ****     ***   ")      
-Print("                                              *****")      
-Print("Version 1.0                                     ***")
-Print("                                              ****  ")   
-Print(" ")
-Print(" ")
-Print(" ")  
+  Print("  **** *****   *******    ****   ***   ***    ***")     
+  Print("*****  ******  ********  ******  ***  ***    *****")  
+  Print("***    **  **  ***  ***  **  **  *** ***    **   **") 
+  Print(" ***   **  **  ***  **   **  **  ******     **   **")  
+  Print("  ***  *****   ******    ******  *****       *****")
+  Print("   *** ****    *****     ******  *****        ***  ")
+  Print("   *** **      **  **    **  **  ** ***          ")
+  Print(" ***   **      **  ***   **  **  **  ***       ****")
+  Print("**     **      **   **   **  **  **  ****     ***   ")      
+  Print("                                              *****")      
+  Print("Version 1.0                                     ***")
+  Print("                                              ****  ")   
+  Print(" ")
+  Print(" ")
+  Print(" ")  
 end
 
